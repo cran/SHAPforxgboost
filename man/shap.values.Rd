@@ -9,22 +9,27 @@ shap.values(xgb_model, X_train)
 \arguments{
 \item{xgb_model}{a xgboost model object}
 
-\item{X_train}{the dataset of predictors used for the xgboost model}
+\item{X_train}{the dataset of predictors (independent variables) used for the
+xgboost model}
 }
 \value{
-a list of three elements, the SHAP values as data.table, ranked mean|SHAP|, BIAS
+a list of three elements: the SHAP values as data.table, ranked
+mean|SHAP|, and BIAS
 }
 \description{
-\code{shap.values} returns from xgboost model a list of 1.the matrix of shap score and
-2. the ranked variable vector by each variable's mean absolute SHAP value
+The \code{shap.values} returns a list of three objects from xgboost model: 1.
+a dataset (data.table) of SHAP scores. It has the same dimension as the
+X_train); 2. the ranked variable vector by each variable's mean absolute SHAP
+value, it ranks the predictors by their importance in the model; and 3. The
+BIAS, which is like an intercept. The rowsum of SHAP values including the
+BIAS would equal to the predicted value (y_hat).
 }
 \examples{
 data("iris")
 X1 = as.matrix(iris[,-5])
 mod1 = xgboost::xgboost(
   data = X1, label = iris$Species, gamma = 0, eta = 1,
-  lambda = 0,nrounds = 1, verbose = FALSE)
-
+  lambda = 0, nrounds = 1, verbose = FALSE)
 
 # shap.values(model, X_dataset) returns the SHAP
 # data matrix and ranked features by mean|SHAP|
@@ -47,5 +52,5 @@ shap.plot.summary.wrap1(mod1, X = as.matrix(iris[,-5]), top_n = 3)
 
 # option 2: supply a self-made SHAP values dataset
 # (e.g. sometimes as output from cross-validation)
-shap.plot.summary.wrap2(shap_values_iris, X1, top_n = 3)
+shap.plot.summary.wrap2(shap_score = shap_values_iris, X = X1, top_n = 3)
 }
