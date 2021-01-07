@@ -4,7 +4,9 @@
 \name{dataXY_df}
 \alias{dataXY_df}
 \title{Terra satellite data (X,Y) for running the xgboost model .}
-\format{An object of class \code{data.table} (inherits from \code{data.frame}) with 10148 rows and 10 columns.}
+\format{
+An object of class \code{data.table} (inherits from \code{data.frame}) with 10148 rows and 10 columns.
+}
 \usage{
 dataXY_df
 }
@@ -12,6 +14,6 @@ dataXY_df
 Data.table, contains 9 features, and about 10,000 observations
 }
 \references{
-\url{http://doi.org/10.5281/zenodo.3334713}
+\doi{https://doi.org/10.5281/zenodo.3568449}
 }
 \keyword{Terra}

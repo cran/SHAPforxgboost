@@ -4,7 +4,9 @@
 \name{labels_within_package}
 \alias{labels_within_package}
 \title{labels_within_package: Some labels package auther defined to make his plot, mainly serve the paper publication.}
-\format{An object of class \code{list} of length 20.}
+\format{
+An object of class \code{list} of length 20.
+}
 \usage{
 labels_within_package
 }
@@ -36,6 +38,6 @@ Optical_Depth_047_a = "MAIAC AOD470nm (Aqua)"
 )
 }
 \references{
-\url{http://doi.org/10.5281/zenodo.3334713}
+\doi{https://doi.org/10.5281/zenodo.3568449}
 }
 \keyword{Labels}
