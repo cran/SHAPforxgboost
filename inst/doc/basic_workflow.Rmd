@@ -1,0 +1,91 @@
+---
+title: "Basic Workflow"
+description: >
+  This vignette describes the basic workflow of SHAPforxgboost.
+bibliography: "biblio.bib"
+link-citations: true
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Basic Workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 5,
+  fig.height = 4
+)
+```
+
+## Introduction
+
+This vignette shows the basic workflow of using `SHAPforxgboost` for interpretation of models trained with `XGBoost`, a hightly efficient gradient boosting implementation [@chen2016].
+
+```{r setup}
+library("ggplot2")
+library("SHAPforxgboost")
+library("xgboost")
+
+set.seed(9375)
+```
+
+## Training the model
+
+Let's train a small model to predict the first column in the iris data set, namely `Sepal.Length`.
+
+```{r}
+head(iris)
+
+X <- data.matrix(iris[, -1])
+dtrain <- xgb.DMatrix(X, label = iris[[1]])
+
+fit <- xgb.train(
+  params = list(
+    objective = "reg:squarederror",
+    learning_rate = 0.1
+  ), 
+  data = dtrain,
+  nrounds = 50
+)
+
+```
+
+## SHAP analysis
+
+Now, we can prepare the SHAP values and analyze the results. All this in just very few lines of code!
+
+```{r}
+# Crunch SHAP values
+shap <- shap.prep(fit, X_train = X)
+
+# SHAP importance plot
+shap.plot.summary(shap)
+
+# Dependence plots in decreasing order of importance
+# (colored by strongest interacting variable)
+for (x in shap.importance(shap, names_only = TRUE)) {
+  p <- shap.plot.dependence(
+    shap, 
+    x = x, 
+    color_feature = "auto", 
+    smooth = FALSE, 
+    jitter_width = 0.01, 
+    alpha = 0.4
+    ) +
+  ggtitle(x)
+  print(p)
+}
+
+```
+
+*Note: `print` is required only in the context of using `ggplot` in `rmarkdown` and for loop.*
+
+This is just a teaser: `SHAPforxgboost` can do much more! Check out the README for much more information.
+
+## References
+

@@ -15,7 +15,11 @@ shap.plot.dependence(
   smooth = TRUE,
   size0 = NULL,
   add_hist = FALSE,
-  add_stat_cor = FALSE
+  add_stat_cor = FALSE,
+  alpha = NULL,
+  jitter_height = 0,
+  jitter_width = 0,
+  ...
 )
 }
 \arguments{
@@ -28,7 +32,9 @@ that feature. y is default to x, if y is not provided, just plot the SHAP
 values of x on the y-axis}
 
 \item{color_feature}{which feature value to use for coloring, color by the
-feature value}
+feature value. If "auto", will select the feature "c" minimizing the
+variance of the shap value given x and c, which can be viewed as a
+heuristic for the strongest interaction.}
 
 \item{data_int}{the 3-dimention SHAP interaction values array. if \code{data_int}
 is supplied, y-axis will plot the interaction values of y (vs. x).
@@ -42,7 +48,7 @@ data}
 
 \item{smooth}{optional to add a \emph{loess} smooth line, default to TRUE.}
 
-\item{size0}{point size, default to 1 of nobs<1000, 0.4 if nobs>1000}
+\item{size0}{point size, default to 1 if nobs<1000, 0.4 if nobs>1000}
 
 \item{add_hist}{whether to add histogram using \code{ggMarginal}, default to
 TRUE. But notice the plot after adding histogram is a \code{ggExtraPlot} object
@@ -50,6 +56,14 @@ instead of \code{ggplot2} so cannot add \code{geom} to that anymore. Turn the
 histogram off if you wish to add more \code{ggplot2} geoms}
 
 \item{add_stat_cor}{add correlation and p-value from \code{ggpubr::stat_cor}}
+
+\item{alpha}{point transparancy, default to 1 if nobs<1000 else 0.6}
+
+\item{jitter_height}{amount of vertical jitter (see hight in \code{geom_jitter})}
+
+\item{jitter_width}{amount of horizontal jitter (see width in \code{geom_jitter}). Use values close to 0, e.g. 0.02}
+
+\item{...}{additional parameters passed to \code{geom_jitter}}
 }
 \value{
 be default a \code{ggplot2} object, based on which you could add more geom

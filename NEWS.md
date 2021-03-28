@@ -1,3 +1,16 @@
+# SHAPforxgboost 0.1.1
+
+* 22/03/2021 Moved `lightgbm` from imported to suggested package.
+
+* 05/02/2021 Added `color_feature = "auto"` in `shap.plot.dependence` in order to 
+colorize the (heuristically found) strongest interaction.
+
+* 06/02/2021 Added vignette.
+
+* 06/02/2021 Added function `shap.importance` to return mean absolute SHAP values per variable.
+
+* 10/02/2021 Added `jitter_width`, `jitter_height` and `alpha` to `shap.plot.dependence`.
+
 # SHAPforxgboost 0.1.0
 * 12/12/2020 Added support for LightGBM.
 
