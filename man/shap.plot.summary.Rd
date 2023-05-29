@@ -9,7 +9,10 @@ shap.plot.summary(
   x_bound = NULL,
   dilute = FALSE,
   scientific = FALSE,
-  my_format = NULL
+  my_format = NULL,
+  min_color_bound = "#FFCC33",
+  max_color_bound = "#6600CC",
+  kind = c("sina", "bar")
 )
 }
 \arguments{
@@ -29,6 +32,17 @@ after dilution, will just plot all the data}
 format is 0.0E-0, default to FALSE, and the format will be 0.000}
 
 \item{my_format}{supply your own number format if you really want}
+
+\item{min_color_bound}{min color hex code for colormap. Color gradient is
+scaled between min_color_bound and max_color_bound. Default is "#FFCC33".}
+
+\item{max_color_bound}{max color hex code for colormap. Color gradient is
+scaled between min_color_bound and max_color_bound. Default is "#6600CC".}
+
+\item{kind}{By default, a "sina" plot is shown. As an alternative,
+set \code{kind = "bar"} to visualize mean absolute SHAP values as a
+barplot. Its color is controlled by \code{max_color_bound}. Other
+arguments are ignored for this kind of plot.}
 }
 \value{
 returns a ggplot2 object, could add further layers.
@@ -51,7 +65,7 @@ data("iris")
 X1 = as.matrix(iris[,-5])
 mod1 = xgboost::xgboost(
   data = X1, label = iris$Species, gamma = 0, eta = 1,
-  lambda = 0, nrounds = 1, verbose = FALSE)
+  lambda = 0, nrounds = 1, verbose = FALSE, nthread = 1)
 
 # shap.values(model, X_dataset) returns the SHAP
 # data matrix and ranked features by mean|SHAP|

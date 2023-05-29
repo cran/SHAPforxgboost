@@ -11,16 +11,18 @@
 
 #' Get SHAP scores from a trained XGBoost or LightGBM model
 #'
-#' \code{shap.values} returns a list of three objects from XGBoost or LightGBM model: 1.
-#' a dataset (data.table) of SHAP scores. It has the same dimension as the
-#' X_train); 2. the ranked variable vector by each variable's mean absolute SHAP
-#' value, it ranks the predictors by their importance in the model; and 3. The
-#' BIAS, which is like an intercept. The rowsum of SHAP values including the
-#' BIAS would equal to the predicted value (y_hat).
+#' \code{shap.values} returns a list of three objects from XGBoost or LightGBM
+#' model: 1. a dataset (data.table) of SHAP scores. It has the same dimension as
+#' the X_train); 2. the ranked variable vector by each variable's mean absolute
+#' SHAP value, it ranks the predictors by their importance in the model; and 3.
+#' The BIAS, which is like an intercept. The rowsum of SHAP values including the
+#' BIAS would equal to the predicted value (y_hat) generally speaking.
 #'
 #' @param xgb_model an XGBoost or LightGBM model object
-#' @param X_train the dataset of predictors (independent variables) used
-#'   for calculating SHAP values, it should be a matrix
+#' @param X_train the data supplied to the `predict` function to get the
+#'   prediction. It should be a matrix. Notice that coercing the matrix to a
+#'   dense matrix by using `as.matrix` might lead to wrong behaviors in some
+#'   cases. See discussion in issues on this topic.
 #'
 #' @import data.table
 #' @import xgboost
@@ -209,6 +211,14 @@ shap.prep.interaction <- function(xgb_model, X_train){
 #' @param scientific  show the mean|SHAP| in scientific format. If TRUE, label
 #'   format is 0.0E-0, default to FALSE, and the format will be 0.000
 #' @param my_format supply your own number format if you really want
+#' @param min_color_bound min color hex code for colormap. Color gradient is
+#'   scaled between min_color_bound and max_color_bound. Default is "#FFCC33".
+#' @param max_color_bound max color hex code for colormap. Color gradient is
+#'   scaled between min_color_bound and max_color_bound. Default is "#6600CC".
+#' @param kind By default, a "sina" plot is shown. As an alternative,
+#'   set \code{kind = "bar"} to visualize mean absolute SHAP values as a
+#'   barplot. Its color is controlled by \code{max_color_bound}. Other
+#'   arguments are ignored for this kind of plot.
 #'
 #' @import ggplot2
 #' @importFrom ggforce geom_sina
@@ -221,7 +231,23 @@ shap.plot.summary <- function(data_long,
                               x_bound = NULL,
                               dilute = FALSE,
                               scientific = FALSE,
-                              my_format = NULL){
+                              my_format = NULL,
+                              min_color_bound = "#FFCC33",
+                              max_color_bound = "#6600CC",
+                              kind = c("sina", "bar")){
+
+  kind <- match.arg(kind)
+  if (kind == "bar") {
+    imp <- shap.importance(data_long)
+    p <- ggplot(imp, aes(x = variable, y = mean_abs_shap)) +
+      geom_bar(stat = "identity", fill = max_color_bound) +
+      coord_flip() +
+      scale_x_discrete(limits = rev(levels(imp[["variable"]]))) +
+      theme_bw() +
+      theme(axis.title.x = element_text(size = 10)) +
+      labs(x = element_blank(), y = "Avg(|SHAP|)")
+    return(p)
+  }
 
   if (scientific){label_format = "%.1e"} else {label_format = "%.3f"}
   if (!is.null(my_format)) label_format <- my_format
@@ -250,12 +276,13 @@ shap.plot.summary <- function(data_long,
               aes(x = variable, y=-Inf, label = sprintf(label_format, mean_value)),
               size = 3, alpha = 0.7,
               hjust = -0.2,
-              fontface = "bold") + # bold
+              fontface = "bold",
+              check_overlap = TRUE) + # bold
     # # add a "SHAP" bar notation
     # annotate("text", x = -Inf, y = -Inf, vjust = -0.2, hjust = 0, size = 3,
     #          label = expression(group("|", bar(SHAP), "|"))) +
-    scale_color_gradient(low="#FFCC33", high="#6600CC",
-                         breaks=c(0,1), labels=c(" Low","High "),
+    scale_color_gradient(low=min_color_bound, high=max_color_bound,
+                         breaks=c(0,1), labels=c(" Low", "High "),
                          guide = guide_colorbar(barwidth = 12, barheight = 0.3)) +
     theme_bw() +
     theme(axis.line.y = element_blank(),
